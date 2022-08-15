@@ -6,8 +6,10 @@ import { mobile } from "../responsive";
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { Context } from "../context/Context";
-import { Button } from "@mui/material"
+import { Button } from "@mui/material";
 import { Logout } from "../context/Actions";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   height: 60px;
@@ -73,6 +75,8 @@ const MenuItem = styled.div`
 
 const Navbar = () => {
   const { user, dispatch } = useContext(Context);
+  const quantity = useSelector((state) => state.cart.quantity);
+  console.log(quantity);
 
   const logout = () => {
     dispatch(Logout());
@@ -89,17 +93,21 @@ const Navbar = () => {
         </Left>
         <Center>
           <Logo>
-            <img
-              height={60}
-              src={process.env.PUBLIC_URL + "/images/logo.png"}
-            />
+            <NavLink to="/">
+              <img
+                height={60}
+                src={process.env.PUBLIC_URL + "/images/logo.png"}
+              />
+            </NavLink>
           </Logo>
         </Center>
         <Right>
           {user ? (
             <>
-            <h5>Сколько лет сколько зим {user.name}</h5>
-            <Button variant="error" onClick={logout}>Выйти из аккаунта</Button>
+              <h5>Сколько лет сколько зим {user.name}</h5>
+              <Button variant="error" onClick={logout}>
+                Выйти из аккаунта
+              </Button>
             </>
           ) : (
             <>
@@ -113,9 +121,11 @@ const Navbar = () => {
           )}
 
           <MenuItem>
-            <Badge badgeContent={4} color="primary">
-              <ShoppingCartOutlined />
-            </Badge>
+            <Link to="/cart">
+              <Badge badgeContent={quantity} color="primary">
+                <ShoppingCartOutlined />
+              </Badge>
+            </Link>
           </MenuItem>
         </Right>
       </Wrapper>

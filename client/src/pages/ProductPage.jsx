@@ -4,15 +4,17 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { mobile } from "../responsive";
 import { useEffect, useState } from "react";
-import axios from "axios"
+import axios from "axios";
 import { useParams } from "react-router-dom";
+import { addToCart } from "../redux/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Container = styled.div``;
 
 const Wrapper = styled.div`
   padding: 50px;
   display: flex;
-  ${mobile({ padding: "10px", flexDirection:"column" })}
+  ${mobile({ padding: "10px", flexDirection: "column" })}
 `;
 
 const ImgContainer = styled.div`
@@ -111,21 +113,52 @@ const Button = styled.button`
   cursor: pointer;
   font-weight: 500;
 
-  &:hover{
-      background-color: #f8f4f4;
+  &:hover {
+    background-color: #f8f4f4;
   }
 `;
 
 const getProduct = (productId) => {
   return axios.get("http://localhost:8888/api/products/" + productId);
-}
+};
 
 const ProductPage = () => {
-  const [product, setProduct] = useState({})
   const { id } = useParams();
+  const [product, setProduct] = useState({});
+  const [productCount, setProductCount] = useState(1);
+  const [isProductInCart, setIsProductInCart] = useState(false);
+
+  const products = useSelector((s) => s.cart.products);
+  const dispatch = useDispatch();
+
+  const checkProductInCart = () => {
+    const p = products.find((p) => p._id === product._id);
+    if (p) {
+      setIsProductInCart(true);
+    }
+  };
+
+  const handleCart = () => {
+    product.count = productCount;
+    dispatch(addToCart({ product }));
+  };
+
+  const handleProductCount = (type) => {
+    if (type === "add") {
+      setProductCount(productCount + 1);
+    } else {
+      productCount > 1 && setProductCount(productCount - 1);
+      }
+    }
+
   useEffect(() => {
-    getProduct(id).then((product) => setProduct(product.data))
-  }, [])
+    getProduct(id).then((product) => setProduct(product.data));
+  }, []);
+
+  useEffect(() => {
+    checkProductInCart();
+  }, [products, product]);
+
   return (
     <Container>
       <Navbar />
@@ -137,14 +170,18 @@ const ProductPage = () => {
           <Title>{product.name}</Title>
           <Desc>{product.descr}</Desc>
           <Price>{product.price}</Price>
-          <AddContainer>
-            <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
-            </AmountContainer>
-            <Button>ДОБАВИТЬ В КОРЗИНУ</Button>
-          </AddContainer>
+          {isProductInCart ? (
+            <h4>Такой продукт уже имеется в корзине</h4>
+          ) : (
+            <AddContainer>
+              <AmountContainer>
+                <Remove onClick={() => handleProductCount("remove")} />
+                <Amount>{productCount}</Amount>
+                <Add onClick={() => handleProductCount("add")} />
+              </AmountContainer>
+              <Button onClick={handleCart}>ДОБАВИТЬ В КОРЗИНУ</Button>
+            </AddContainer>
+          )}
         </InfoContainer>
       </Wrapper>
       <Footer />

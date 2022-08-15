@@ -1,11 +1,13 @@
-import { Add, Remove } from "@material-ui/icons";
+import { Add, Remove, TouchAppOutlined } from "@material-ui/icons";
 import styled from "styled-components";
 import Layout from "../Layout";
 import { mobile } from "../responsive";
-import { useNavigate } from "react-router-dom"
+import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect } from "react";
 import { useContext } from "react";
-import {Context} from "../context/Context"
+import { Context } from "../context/Context";
+import { useSelector, useDispatch } from "react-redux";
+import { addToCart, removeProductFromCart } from "../redux/cartSlice";
 
 const Container = styled.div``;
 
@@ -49,7 +51,6 @@ const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
   ${mobile({ flexDirection: "column" })}
-
 `;
 
 const Info = styled.div`
@@ -156,95 +157,97 @@ const Button = styled.button`
 `;
 
 const Cart = () => {
-  let navigate = useNavigate()
-  const {user} = useContext(Context)
+  let navigate = useNavigate();
+  const { user } = useContext(Context);
+  const products = useSelector((s) => s.cart.products);
+  const totalPrice = useSelector(state => state.cart.totalPrice)
+  const dispatch = useDispatch();
+
+  // const 
+
+  const addProduct = (product) => {
+    dispatch(addToCart({ product }));
+  };
+
+  const removeProduct = (product) => {
+    dispatch(removeProductFromCart({ product }));
+  };
+
   useEffect(() => {
-    if(!user) {
-      return navigate("/login")
+    if (!user) {
+      return navigate("/login");
     }
-  }, [user])
+  }, [user]);
+
   return (
     <Container>
-      <Layout >
-      <Wrapper>
-        <Title>ВАША КОРЗИНА</Title>
-        <Top>
-          <TopButton>ПРОДОЛЖИТЬ ПОКУПКИ</TopButton>
-          <TopTexts>
-            <TopText>Корзина (2)</TopText>
-            <TopText>Желаемые (0)</TopText>
-          </TopTexts>
-          <TopButton type="filled">ОПЛАТИТЬ</TopButton>
-        </Top>
-        <Bottom>
-          <Info>
-            <Product>
-              <ProductDetail>
-                <Image src="https://www.freepnglogos.com/uploads/burger-png/burgers-burger-king-29.png" />
-                <Details>
-                  <ProductName>
-                    <b>Продукт:</b> Бургер
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> NNNNNNN
-                  </ProductId>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>2</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>250 сом</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://www.freepnglogos.com/uploads/drinks-png/drinks-pepper-smash-cocktail-kitchen-dallas-plano-3.png" />
-                <Details>
-                  <ProductName>
-                    <b>Продукт:</b> Милкшейк
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> NNNNNNNN
-                  </ProductId>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>1</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>200сом</ProductPrice>
-              </PriceDetail>
-            </Product>
-          </Info>
-          <Summary>
-            <SummaryTitle>ВАШИ ПОКУПКИ</SummaryTitle>
-            <SummaryItem>
-              <SummaryItemText>Цена покупок</SummaryItemText>
-              <SummaryItemPrice>700 с</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Доставка</SummaryItemText>
-              <SummaryItemPrice>150 с</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Скидка на доставку</SummaryItemText>
-              <SummaryItemPrice>-150 с</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem type="total">
-              <SummaryItemText>Общий</SummaryItemText>
-              <SummaryItemPrice>700 с </SummaryItemPrice>
-            </SummaryItem>
-            <Button>Купить</Button>
-          </Summary>
-        </Bottom>
-      </Wrapper>
-      </Layout >
+      <Layout>
+        <Wrapper>
+          <Title>КОРЗИНА</Title>
+          <Top>
+            <NavLink to="/">
+            <TopButton>ПРОДОЛЖИТЬ ПОКУПКИ</TopButton>
+            </NavLink>
+            <TopTexts>
+              <TopText>Корзина (2)</TopText>
+              <TopText>Желаемые (0)</TopText>
+            </TopTexts>
+            <TopButton type="filled">ОПЛАТИТЬ</TopButton>
+          </Top>
+          <Bottom>
+            <Info>
+              {products.map((p) => {
+                return (
+                  <>
+                    <Product>
+                      <ProductDetail>
+                        <Image src={p.img} />
+                        <Details>
+                          <ProductName>
+                            <b>Продукт:</b> {p.name}
+                          </ProductName>
+                          <ProductId>
+                            <b>ID:</b> {p._id}
+                          </ProductId>
+                        </Details>
+                      </ProductDetail>
+                      <PriceDetail>
+                        <ProductAmountContainer>
+                          <Add onClick={() => addProduct(p)} />
+                          <ProductAmount>{p.count}</ProductAmount>
+                          <Remove onClick={() => removeProduct(p)} />
+                        </ProductAmountContainer>
+                        <ProductPrice>{p.price}</ProductPrice>
+                      </PriceDetail>
+                    </Product>
+                    <Hr />
+                  </>
+                );
+              })}
+            </Info>
+            <Summary>
+              <SummaryTitle>ВАШИ ПОКУПКИ</SummaryTitle>
+              <SummaryItem>
+                <SummaryItemText>Цена покупок</SummaryItemText>
+                <SummaryItemPrice>{totalPrice} с</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Доставка</SummaryItemText>
+                <SummaryItemPrice>150 с</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Скидка на доставку</SummaryItemText>
+                <SummaryItemPrice>-150 с</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem type="total">
+                <SummaryItemText>Общий</SummaryItemText>
+                <SummaryItemPrice>{totalPrice} с </SummaryItemPrice>
+              </SummaryItem>
+              <Button>Купить</Button>
+            </Summary>
+          </Bottom>
+        </Wrapper>
+      </Layout>
     </Container>
   );
 };
