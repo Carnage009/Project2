@@ -5,6 +5,11 @@ import {
 } from "@material-ui/icons";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/cartSlice";
+import { toast } from "react-toastify";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const Info = styled.div`
   opacity: 0;
@@ -68,12 +73,36 @@ const Icon = styled.div`
 `;
 
 const Product = ({ item }) => {
+  const [isProductInCart, setIsProductInCart] = useState(false);
+
+  const dispatch = useDispatch();
+  const products = useSelector((s) => s.cart.products);
+
+  useEffect(() => {
+    const product = products.find((p) => p._id === item._id);
+    if (product) {
+      setIsProductInCart(true);
+    }
+  }, [products]);
+
+  const handleCartClick = () => {
+    if (isProductInCart) {
+      toast.error(
+        "Товар уже в корзине! для дальнейших манипуляций перейдите в корзину"
+      );
+    } else {
+      item.count = 1;
+      dispatch(addToCart({ product: item }));
+      toast.success("Товар добавлен в корзину")
+    }
+  };
+
   return (
     <Container>
       <Circle />
       <Image src={item.img} />
       <Info>
-        <Icon>
+        <Icon onClick={handleCartClick}>
           <ShoppingCartOutlined />
         </Icon>
         <NavLink to={`/product/${item._id}`}>

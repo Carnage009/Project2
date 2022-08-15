@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Layout from "../Layout";
 import { mobile } from "../responsive";
 import { useNavigate, NavLink } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { Context } from "../context/Context";
 import { useSelector, useDispatch } from "react-redux";
@@ -160,10 +160,8 @@ const Cart = () => {
   let navigate = useNavigate();
   const { user } = useContext(Context);
   const products = useSelector((s) => s.cart.products);
-  const totalPrice = useSelector(state => state.cart.totalPrice)
+  const totalPrice = useSelector((state) => state.cart.totalPrice);
   const dispatch = useDispatch();
-
-  // const 
 
   const addProduct = (product) => {
     dispatch(addToCart({ product }));
@@ -186,7 +184,7 @@ const Cart = () => {
           <Title>КОРЗИНА</Title>
           <Top>
             <NavLink to="/">
-            <TopButton>ПРОДОЛЖИТЬ ПОКУПКИ</TopButton>
+              <TopButton>ПРОДОЛЖИТЬ ПОКУПКИ</TopButton>
             </NavLink>
             <TopTexts>
               <TopText>Корзина (2)</TopText>
@@ -229,19 +227,23 @@ const Cart = () => {
               <SummaryTitle>ВАШИ ПОКУПКИ</SummaryTitle>
               <SummaryItem>
                 <SummaryItemText>Цена покупок</SummaryItemText>
-                <SummaryItemPrice>{totalPrice} с</SummaryItemPrice>
+                <SummaryItemPrice>{totalPrice}сом</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Доставка</SummaryItemText>
-                <SummaryItemPrice>150 с</SummaryItemPrice>
+                <SummaryItemPrice>{totalPrice > 500 ? 0 :150}сом</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Скидка на доставку</SummaryItemText>
-                <SummaryItemPrice>-150 с</SummaryItemPrice>
+                <SummaryItemPrice>{totalPrice < 500 ? 0 : -150}сом</SummaryItemPrice>
               </SummaryItem>
               <SummaryItem type="total">
                 <SummaryItemText>Общий</SummaryItemText>
-                <SummaryItemPrice>{totalPrice} с </SummaryItemPrice>
+                <SummaryItemPrice>{totalPrice > 500
+                 ? totalPrice
+                 : totalPrice === 0
+                 ? 0
+                 : totalPrice + 150}сом</SummaryItemPrice>
               </SummaryItem>
               <Button>Купить</Button>
             </Summary>
