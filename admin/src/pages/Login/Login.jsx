@@ -1,7 +1,5 @@
 import styled from "styled-components";
-import { mobile } from "../responsive";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import OutlinedInput from "@mui/material/OutlinedInput";
@@ -11,17 +9,15 @@ import FormControl from "@mui/material/FormControl";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../redux/authSlice";
+import { loginSuccess } from "../../redux/authSlice";
 
 const Container = styled.div`
   width: 100vw;
-  height: 100vh;
+  height:90vh;
   background: linear-gradient(
       rgba(255, 255, 255, 0.5),
       rgba(255, 255, 255, 0.5)
     ),
-    url("https://images.pexels.com/photos/3968061/pexels-photo-3968061.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
-      center;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -32,7 +28,6 @@ const Wrapper = styled.div`
   width: 25%;
   padding: 20px;
   background-color: white;
-  ${mobile({ width: "75%" })}
 `;
 
 const Title = styled.h1`
@@ -95,11 +90,11 @@ const Login = () => {
     };
     login(loginObj)
       .then((data) => {
-        toast.success(data.data.message);
-        dispatch(loginSuccess({ user : data.data.user }));
+        // toast.success(data.data.message);
+        dispatch(loginSuccess({ user: data.data.user }));
       })
       .catch((err) => {
-        toast.error(err.response.data.error);
+        // toast.error(err.response.data.error);
         console.log(err);
       });
   };

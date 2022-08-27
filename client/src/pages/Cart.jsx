@@ -4,10 +4,11 @@ import Layout from "../Layout";
 import { mobile } from "../responsive";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useContext } from "react";
-import { Context } from "../context/Context";
 import { useSelector, useDispatch } from "react-redux";
 import { addToCart, removeProductFromCart } from "../redux/cartSlice";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutForm from "../components/CheckoutForm";
 
 const Container = styled.div``;
 
@@ -156,12 +157,16 @@ const Button = styled.button`
   font-weight: 600;
 `;
 
+const stripePromise = loadStripe(
+  "pk_test_51LY8GCHlCgFo7Bbfjt6DcH6HD5lTtnHVzCsD7vB1DkSwgaw3Cs7reDnP0n3eONYpvKNPohVO2ZnOznmXDE8sNEmx00XpmIalS5"
+);
+
 const Cart = () => {
   let navigate = useNavigate();
-  const { user } = useContext(Context);
   const products = useSelector((s) => s.cart.products);
   const totalPrice = useSelector((state) => state.cart.totalPrice);
   const dispatch = useDispatch();
+  const user = useSelector((s) => s.auth.user);
 
   const addProduct = (product) => {
     dispatch(addToCart({ product }));
@@ -231,23 +236,33 @@ const Cart = () => {
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Доставка</SummaryItemText>
-                <SummaryItemPrice>{totalPrice > 500 ? 0 :150}сом</SummaryItemPrice>
+                <SummaryItemPrice>
+                  {totalPrice > 500 ? 0 : 150}сом
+                </SummaryItemPrice>
               </SummaryItem>
               <SummaryItem>
                 <SummaryItemText>Скидка на доставку</SummaryItemText>
-                <SummaryItemPrice>{totalPrice < 500 ? 0 : -150}сом</SummaryItemPrice>
+                <SummaryItemPrice>
+                  {totalPrice < 500 ? 0 : -150}сом
+                </SummaryItemPrice>
               </SummaryItem>
               <SummaryItem type="total">
                 <SummaryItemText>Общий</SummaryItemText>
-                <SummaryItemPrice>{totalPrice > 500
-                 ? totalPrice
-                 : totalPrice === 0
-                 ? 0
-                 : totalPrice + 150}сом</SummaryItemPrice>
+                <SummaryItemPrice>
+                  {totalPrice > 500
+                    ? totalPrice
+                    : totalPrice === 0
+                    ? 0
+                    : totalPrice + 150}
+                  сом
+                </SummaryItemPrice>
               </SummaryItem>
               <Button>Купить</Button>
             </Summary>
           </Bottom>
+          <Elements stripe={stripePromise}>
+            <CheckoutForm />
+          </Elements>
         </Wrapper>
       </Layout>
     </Container>

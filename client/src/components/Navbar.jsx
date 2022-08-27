@@ -4,11 +4,8 @@ import React from "react";
 import styled from "styled-components";
 import { mobile } from "../responsive";
 import { NavLink } from "react-router-dom";
-import { useContext } from "react";
-import { Context } from "../context/Context";
 import { Button } from "@mui/material";
-import { Logout } from "../context/Actions";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Container = styled.div`
@@ -74,12 +71,13 @@ const MenuItem = styled.div`
 `;
 
 const Navbar = () => {
-  const { user, dispatch } = useContext(Context);
+  const user = useSelector((s) => s.auth.user);
+  const dispatch = useDispatch();
   const quantity = useSelector((state) => state.cart.quantity);
   console.log(quantity);
 
   const logout = () => {
-    dispatch(Logout());
+    dispatch(user);
   };
   return (
     <Container>
@@ -90,6 +88,11 @@ const Navbar = () => {
             <Input placeholder="Поиск" />
             <Search style={{ color: "gray", fontSize: 16 }} />
           </SearchContainer>
+          {user && (
+            <NavLink to="/editprofile" style={{ textDecoration: "none" }}>
+              <MenuItem>Редактировать профиль</MenuItem>
+            </NavLink>
+          )}
         </Left>
         <Center>
           <Logo>
